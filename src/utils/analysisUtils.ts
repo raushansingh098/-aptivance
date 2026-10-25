@@ -8,8 +8,6 @@ import {
   SkillImportance,
   GapSeverity 
 } from '../types';
-import confetti from 'canvas-confetti';
-
 const IMPORTANCE_WEIGHT_MAP: Record<SkillImportance, number> = {
   'Critical': 5,
   'High': 4,
@@ -17,8 +15,9 @@ const IMPORTANCE_WEIGHT_MAP: Record<SkillImportance, number> = {
   'Optional': 2,
 };
 
-export function triggerConfetti() {
+export async function triggerConfetti() {
   try {
+    const { default: confetti } = await import('canvas-confetti');
     confetti({
       particleCount: 80,
       spread: 70,
