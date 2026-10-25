@@ -43,6 +43,7 @@ export const LandingPage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const openAccount = (mode: 'login' | 'register') => {
+    setIsMenuOpen(false);
     setAuthMode(mode);
     setIsAuthModalOpen(true);
   };
