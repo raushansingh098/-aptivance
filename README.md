@@ -1,32 +1,23 @@
-# React + TypeScript + Vite
+# Aptivance
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aptivance helps students assess their skills, identify gaps for target careers, and plan their learning.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install Node.js and npm.
+2. Install dependencies with `npm install`.
+3. Copy `.env.example` to `.env.local` and set your Supabase project URL and anon/publishable key.
+4. Apply the SQL migration in `supabase/migrations` to your Supabase project.
+5. Start the development server with `npm run dev`.
 
-## React Compiler
+Build the production bundle with `npm run build`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## GitHub Pages
 
-## Expanding the Oxlint configuration
+The published site is served from the repository's `gh-pages` branch:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+https://raushansingh098.github.io/-aptivance/
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+For a new production build, set `GITHUB_PAGES=true` while running `npm run build` so asset paths use the GitHub Pages project subpath. Publish the contents of `dist` to the `gh-pages` branch. Do not commit `.env.local`.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+In Supabase Auth URL Configuration, set the Site URL and redirect allowlist to the published URL. The browser app uses the public anon/publishable key; never expose a service-role key.

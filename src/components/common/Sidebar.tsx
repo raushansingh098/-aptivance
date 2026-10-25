@@ -98,7 +98,7 @@ export const Sidebar: React.FC = () => {
               <GraduationCap className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight">SkillBridge</span>
+              <span className="text-lg font-bold tracking-tight">Aptivance</span>
             </div>
           </div>
           <button

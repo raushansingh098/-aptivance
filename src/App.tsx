@@ -49,8 +49,6 @@ const MainContent: React.FC = () => {
 
       {/* Global Interactive Utilities */}
       <CommandPalette />
-      <ToastContainer />
-      <AuthModal />
     </div>
   );
 };
@@ -58,9 +56,20 @@ const MainContent: React.FC = () => {
 export function App() {
   return (
     <AppProvider>
-      <MainContent />
+      <AppSession />
     </AppProvider>
   );
 }
+
+const AppSession: React.FC = () => {
+  const { isAuthenticated } = useApp();
+
+  return (
+    <>
+      {isAuthenticated ? <MainContent /> : <AuthModal />}
+      <ToastContainer />
+    </>
+  );
+};
 
 export default App;

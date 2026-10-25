@@ -44,7 +44,7 @@ export const ReportView: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `SkillBridge-Report-${currentStudent.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `Aptivance-Report-${currentStudent.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
     showToast('Student report & taxonomy data exported as JSON!');
@@ -107,9 +107,9 @@ export const ReportView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-xl bg-[#00875a] text-white flex items-center justify-center font-black text-sm">
-                SB
+                A
               </div>
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">SkillBridge Career Intelligence</span>
+              <span className="font-extrabold text-lg tracking-tight text-slate-900">Aptivance Career Intelligence</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
               Student Competency & Gap Audit
@@ -263,7 +263,7 @@ export const ReportView: React.FC = () => {
           <div>
             <p className="font-semibold text-slate-700">Career Advisor Verification:</p>
             <div className="mt-8 border-b border-slate-300 w-48" />
-            <p className="mt-1 text-[11px]">SkillBridge Authorized Assessment</p>
+            <p className="mt-1 text-[11px]">Aptivance Authorized Assessment</p>
           </div>
         </div>
       </div>
@@ -289,7 +289,7 @@ export const ReportView: React.FC = () => {
             {/* Preview Card */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-800 to-[#00875a] text-white shadow-md mb-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200 block">
-                SkillBridge Verified Profile
+                Aptivance Verified Profile
               </span>
               <h4 className="font-black text-lg mt-1">{currentStudent.name}</h4>
               <p className="text-xs text-emerald-100">{currentStudent.headline}</p>

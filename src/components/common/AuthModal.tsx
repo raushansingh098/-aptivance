@@ -10,7 +10,8 @@ export const AuthModal: React.FC = () => {
     setAuthMode,
     loginUser,
     registerUser,
-    isBackendConfigured
+    isBackendConfigured,
+    isAuthenticated
   } = useApp();
 
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ export const AuthModal: React.FC = () => {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (!isAuthModalOpen) return null;
+  if (!isAuthModalOpen && isAuthenticated) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,16 +46,18 @@ export const AuthModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200/80 p-8 animate-in fade-in zoom-in-95 duration-150">
-        <button
-          onClick={() => setIsAuthModalOpen(false)}
-          className="absolute top-5 right-5 p-1 text-slate-400 hover:text-slate-600 rounded-lg"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {isAuthenticated && (
+          <button
+            onClick={() => setIsAuthModalOpen(false)}
+            className="absolute top-5 right-5 p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
 
         <div className="flex items-center gap-2 mb-6 text-[#00875a]">
           <GraduationCap className="w-6 h-6" />
-          <span className="font-extrabold text-xl text-slate-900 tracking-tight">SkillBridge</span>
+          <span className="font-extrabold text-xl text-slate-900 tracking-tight">Aptivance</span>
         </div>
 
         <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-6">
@@ -62,8 +65,8 @@ export const AuthModal: React.FC = () => {
         </h2>
 
         {!isBackendConfigured && (
-          <p className="mb-4 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-            Supabase keys are not set. Copy `.env.example` to `.env.local` so accounts persist in the cloud.
+          <p className="mb-4 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+            Account sign-in is temporarily unavailable because the site owner has not connected the account service yet.
           </p>
         )}
 
@@ -79,6 +82,7 @@ export const AuthModal: React.FC = () => {
               placeholder="your@email.com"
               className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-[#f8fafc] text-sm text-slate-800 focus:outline-hidden focus:border-blue-600 focus:bg-white transition"
               required
+              disabled={!isBackendConfigured || busy}
             />
           </div>
 
@@ -94,6 +98,7 @@ export const AuthModal: React.FC = () => {
                 placeholder="Your Name"
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-[#f8fafc] text-sm text-slate-800 focus:outline-hidden focus:border-blue-600 focus:bg-white transition"
                 required
+                disabled={!isBackendConfigured || busy}
               />
               <p className="text-[11px] text-slate-400 mt-1">
                 Spaces, emojis, and special characters are all allowed
@@ -112,6 +117,7 @@ export const AuthModal: React.FC = () => {
               placeholder="••••••••"
               className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-[#f8fafc] text-sm text-slate-800 focus:outline-hidden focus:border-blue-600 focus:bg-white transition"
               required
+              disabled={!isBackendConfigured || busy}
             />
             {authMode === 'register' && (
               <p className="text-[11px] text-slate-400 mt-1">
@@ -128,7 +134,7 @@ export const AuthModal: React.FC = () => {
 
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || !isBackendConfigured}
             className="w-full mt-2 py-3 px-4 bg-[#1d4ed8] text-white font-bold rounded-2xl hover:bg-blue-700 shadow-md shadow-blue-500/20 transition disabled:opacity-60"
           >
             {busy ? 'Please wait…' : authMode === 'register' ? 'Create Account' : 'Log In'}

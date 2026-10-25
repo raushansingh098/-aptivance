@@ -512,7 +512,7 @@ export const initialRecommendations: Recommendation[] = [
     skillName: 'Data analysis',
     title: 'Project: E-Commerce Customer Cohort & Retention Analysis',
     type: 'project',
-    provider: 'SkillBridge Project Brief',
+    provider: 'Aptivance Project Brief',
     duration: '14 hours',
     difficulty: 'Intermediate',
     rating: 4.88,

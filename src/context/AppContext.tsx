@@ -164,7 +164,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAdminMode, setIsAdminMode] = useState<boolean>(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(true);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
   const [sidebarTheme, setSidebarTheme] = useState<'dark-navy' | 'light'>(() => {
     try {
@@ -664,82 +664,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loginUser = async (email: string, password: string) => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      if (data.user) {
-        await syncSessionProfile(data.user.id, data.user.email);
-      }
-      setIsAuthModalOpen(false);
-      showToast(`Logged in as ${data.user?.email || email}!`);
-      return;
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error('Account service is not configured yet. Please try again later.');
     }
 
-    const existing = students.find(s => s.email.toLowerCase() === email.toLowerCase());
-    if (existing) {
-      setCurrentStudentIdState(existing.id);
-      setIsAuthModalOpen(false);
-      showToast(`Logged in as ${existing.name}!`);
-    } else {
-      setCurrentStudentIdState(initialStudents[0].id);
-      setIsAuthModalOpen(false);
-      showToast(`Logged in successfully!`);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (data.user) {
+      await syncSessionProfile(data.user.id, data.user.email);
     }
+    setIsAuthModalOpen(false);
+    showToast(`Logged in as ${data.user?.email || email}!`);
   };
 
   const registerUser = async (name: string, email: string, password: string) => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { name } }
-      });
-      if (error) throw error;
-      if (data.session?.user) {
-        const profile = await syncSessionProfile(data.session.user.id, data.session.user.email);
-        if (!profile.skills.length && initialStudents[0]?.skills) {
-          const seeded = { ...profile, name, email, skills: initialStudents[0].skills };
-          applyRemoteProfile(seeded);
-          await saveProfile(seeded);
-        }
-        setIsAuthModalOpen(false);
-        triggerConfetti();
-        showToast(`Welcome to SkillBridge, ${name}! Account created.`);
-        return;
-      }
-      setIsAuthModalOpen(false);
-      showToast('Account created. Confirm your email, then log in.', 'info');
-      return;
+    if (!isSupabaseConfigured || !supabase) {
+      throw new Error('Account service is not configured yet. Please try again later.');
     }
 
-    const newStudent: StudentProfile = {
-      id: 'student-' + Date.now(),
-      name: name || 'Raushan',
-      email: email || 'user@example.com',
-      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80',
-      headline: 'Aspiring Specialist | Continuous Learner',
-      university: 'Tech University',
-      major: 'Computer Science & Analytics',
-      expectedGraduation: '2027',
-      targetRoleId: 'role-data-analyst',
-      secondaryTargetRoleIds: ['role-data-scientist'],
-      weeklyStudyHours: 15,
-      grantedMentors: [],
-      skills: initialStudents[0].skills,
-      goals: [],
-      historicalReadiness: [
-        { date: '24/10/2026', score: 56.8, roleTitle: 'Data Analyst' }
-      ],
-      unlockedBadges: [
-        { id: 'b-new', title: 'New Member', description: 'Joined SkillBridge', dateUnlocked: '24/10/2026', icon: 'Sparkles' }
-      ]
-    };
-
-    setStudents(prev => [newStudent, ...prev]);
-    setCurrentStudentIdState(newStudent.id);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: new URL(import.meta.env.BASE_URL, window.location.origin).toString()
+      }
+    });
+    if (error) throw error;
+    if (data.session?.user) {
+      const profile = await syncSessionProfile(data.session.user.id, data.session.user.email);
+      if (!profile.skills.length && initialStudents[0]?.skills) {
+        const seeded = { ...profile, name, email, skills: initialStudents[0].skills };
+        applyRemoteProfile(seeded);
+        await saveProfile(seeded);
+      }
+      setIsAuthModalOpen(false);
+      triggerConfetti();
+      showToast(`Welcome to Aptivance, ${name}! Account created.`);
+      return;
+    }
     setIsAuthModalOpen(false);
-    triggerConfetti();
-    showToast(`Welcome to SkillBridge, ${newStudent.name}! Account created.`);
+    showToast('Account created. Confirm your email, then log in.', 'info');
   };
 
   const logoutUser = async () => {
@@ -747,6 +712,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await supabase.auth.signOut();
     }
     setIsAuthenticated(false);
+    setAuthMode('register');
+    setIsAuthModalOpen(true);
     setCurrentStudentIdState(initialStudents[0].id);
     showToast('Signed out.');
   };
