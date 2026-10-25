@@ -2,14 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Search, 
-  Calendar, 
-  Download, 
-  Bell, 
   Menu, 
   ChevronDown, 
-  UserCheck, 
-  ShieldCheck, 
-  Sparkles,
   LogIn,
   Sun,
   Moon
@@ -18,8 +12,6 @@ import {
 export const Header: React.FC = () => {
   const { 
     currentStudent, 
-    students, 
-    setCurrentStudentId, 
     roles,
     activeRole,
     setTargetRole,
@@ -35,7 +27,6 @@ export const Header: React.FC = () => {
     isSyncing
   } = useApp();
 
-  const [isStudentDropdownOpen, setIsStudentDropdownOpen] = useState(false);
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
 
   return (
@@ -148,65 +139,15 @@ export const Header: React.FC = () => {
             </button>
           )}
 
-          {/* Student Profile Switcher */}
-          <div className="relative">
-            <button
-              onClick={() => setIsStudentDropdownOpen(!isStudentDropdownOpen)}
-              className="flex items-center gap-2 p-1 sm:px-2 sm:py-1 bg-white border border-slate-200 rounded-xl shadow-xs hover:border-slate-300"
-            >
-              <img
-                src={currentStudent.avatarUrl}
-                alt={currentStudent.name}
-                className="w-7 h-7 rounded-lg object-cover ring-1 ring-slate-200"
-              />
-              <span className="hidden sm:inline text-xs font-bold text-slate-800">
-                {currentStudent.name}
-              </span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {isStudentDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-                <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                  <p className="text-xs font-bold text-slate-900">{currentStudent.name}</p>
-                  <p className="text-[11px] text-slate-500 truncate">{currentStudent.email}</p>
-                </div>
-
-                <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Switch Preset Student
-                </div>
-
-                <div className="space-y-1">
-                  {students.map(student => (
-                    <button
-                      key={student.id}
-                      onClick={() => {
-                        setCurrentStudentId(student.id);
-                        setIsStudentDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs transition ${
-                        student.id === currentStudent.id
-                          ? 'bg-teal-50 text-teal-900 font-bold'
-                          : 'hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <img
-                        src={student.avatarUrl}
-                        alt={student.name}
-                        className="w-6 h-6 rounded-md object-cover"
-                      />
-                      <div className="truncate flex-1">
-                        <div className="truncate font-semibold">{student.name}</div>
-                        <div className="text-[10px] text-slate-400 truncate">{student.headline}</div>
-                      </div>
-                      {student.id === currentStudent.id && (
-                        <UserCheck className="w-4 h-4 text-teal-600 shrink-0" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="flex items-center gap-2 p-1 sm:px-2 sm:py-1 bg-white border border-slate-200 rounded-xl shadow-xs">
+            <img
+              src={currentStudent.avatarUrl}
+              alt={currentStudent.name}
+              className="w-7 h-7 rounded-lg object-cover ring-1 ring-slate-200"
+            />
+            <span className="hidden sm:inline text-xs font-bold text-slate-800">
+              {currentStudent.name}
+            </span>
           </div>
         </div>
       </div>
