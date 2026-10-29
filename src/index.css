@@ -23,6 +23,38 @@
   letter-spacing: -0.01em;
 }
 
+.aptivance-workspace .bg-white {
+  background-color: #fffefa;
+}
+
+.aptivance-workspace .bg-blue-600,
+.aptivance-workspace button.bg-blue-600 {
+  background-color: #1a5944;
+  color: #fff;
+}
+
+.aptivance-workspace .bg-blue-600:hover,
+.aptivance-workspace [class*="hover:bg-blue-700"]:hover {
+  background-color: #124a38;
+}
+
+.aptivance-workspace .text-blue-600,
+.aptivance-workspace .text-blue-700 {
+  color: #246548;
+}
+
+.aptivance-workspace .bg-white[class*="border-slate-200"],
+.aptivance-workspace .bg-white[class*="border-slate-100"] {
+  border-color: #e4e9e5;
+  box-shadow: 0 3px 12px rgba(23, 45, 37, 0.035);
+}
+
+.aptivance-workspace input,
+.aptivance-workspace select,
+.aptivance-workspace textarea {
+  accent-color: #26734f;
+}
+
 .aptivance-main-content {
   max-width: 1540px;
   padding: clamp(1.25rem, 3vw, 2.7rem) clamp(1rem, 3.2vw, 3rem);
