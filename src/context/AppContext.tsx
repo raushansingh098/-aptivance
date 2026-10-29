@@ -112,6 +112,11 @@ const STORAGE_KEYS = {
   THEME: 'skillbridge_sidebar_theme_v2',
 };
 
+function includeMissingDefaults<T extends { id: string }>(existing: T[], defaults: T[]): T[] {
+  const existingIds = new Set(existing.map(item => item.id));
+  return [...existing, ...defaults.filter(item => !existingIds.has(item.id))];
+}
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [skills, setSkills] = useState<Skill[]>(() => {
     try {
@@ -125,7 +130,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [roles, setRoles] = useState<TargetRole[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ROLES);
-      return saved ? JSON.parse(saved) : initialRoles;
+      return saved
+        ? includeMissingDefaults(JSON.parse(saved) as TargetRole[], initialRoles)
+        : initialRoles;
     } catch {
       return initialRoles;
     }
@@ -259,7 +266,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const catalog = await fetchCatalog();
         if (!cancelled && catalog.skills.length > 0) {
           setSkills(catalog.skills);
-          setRoles(catalog.roles);
+          setRoles(includeMissingDefaults(catalog.roles, initialRoles));
           setRecommendations(catalog.recommendations);
         }
 

@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
-  CheckSquare, 
   Clock, 
-  Award, 
-  HelpCircle, 
   ArrowRight, 
   CheckCircle2, 
   XCircle,
-  Sparkles,
-  RotateCcw
 } from 'lucide-react';
 import { SkillQuiz } from '../../types';
 
@@ -59,7 +54,7 @@ export const QuizzesView: React.FC = () => {
             Skill Validation Quizzes
           </h2>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Test your knowledge to validate self-assessments and unlock verified skill levels.
+            Explore {quizzes.length} quick checks across your technical skills. Pass to validate your skill level.
           </p>
         </div>
       </div>
