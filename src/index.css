@@ -2,11 +2,351 @@
 
 @layer base {
   body {
-    background-color: #f6f8fa;
-    color: #1e293b;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f5f6f2;
+    color: #182b29;
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.aptivance-workspace {
+  --workspace-ink: #182b29;
+  --workspace-muted: #74817c;
+  --workspace-green: #176b54;
+  --workspace-border: #e4e9e5;
+  background:
+    radial-gradient(ellipse at 87% 2%, rgba(218, 234, 215, 0.28), transparent 28rem),
+    #f5f6f2;
+  color: var(--workspace-ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.aptivance-main-content {
+  max-width: 1540px;
+  padding: clamp(1.25rem, 3vw, 2.7rem) clamp(1rem, 3.2vw, 3rem);
+}
+
+.aptivance-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 12px 0 34px rgba(19, 39, 34, 0.055);
+}
+
+.aptivance-sidebar-dark {
+  border-color: #1d312e;
+  background: #10201e;
+  color: #f4f4ec;
+}
+
+.aptivance-sidebar-light {
+  border-color: #e4e9e5;
+  background: #fffefa;
+  color: #182b29;
+}
+
+.aptivance-sidebar-brand {
+  min-height: 76px;
+  border-color: rgba(232, 241, 233, 0.09);
+}
+
+.aptivance-sidebar-brand > div:first-child {
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.aptivance-sidebar-home {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.aptivance-sidebar-home:focus-visible {
+  border-radius: 0.75rem;
+  outline: 2px solid #8cc9a5;
+  outline-offset: 4px;
+}
+
+.aptivance-sidebar-mark {
+  background: linear-gradient(145deg, #40aa83, #176b54);
+  box-shadow: 0 7px 16px rgba(31, 135, 101, 0.24);
+}
+
+.aptivance-sidebar-dark .aptivance-sidebar-brand span {
+  color: #f3f5ef;
+}
+
+.aptivance-sidebar-light .aptivance-sidebar-brand {
+  border-color: #edf0ec;
+}
+
+.aptivance-nav-item {
+  min-height: 42px;
+  color: #a4b2ad;
+  letter-spacing: -0.01em;
+}
+
+.aptivance-nav-item:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: #f5f8f2;
+}
+
+.aptivance-nav-item.is-active {
+  background: linear-gradient(95deg, rgba(47, 150, 113, 0.25), rgba(39, 127, 99, 0.12));
+  box-shadow: inset 2px 0 #62c49a;
+  color: #c0f1d8;
+}
+
+.aptivance-nav-icon {
+  color: #80928b;
+}
+
+.aptivance-nav-icon.is-active {
+  color: #80dfb2;
+}
+
+.aptivance-sidebar-light .aptivance-nav-item {
+  color: #60716a;
+}
+
+.aptivance-sidebar-light .aptivance-nav-item:hover {
+  background: #f1f5ef;
+  color: #193d33;
+}
+
+.aptivance-sidebar-light .aptivance-nav-item.is-active {
+  background: #e8f3e8;
+  box-shadow: inset 2px 0 #368d67;
+  color: #176b54;
+}
+
+.aptivance-sidebar-light .aptivance-nav-icon,
+.aptivance-sidebar-light .aptivance-nav-icon.is-active {
+  color: inherit;
+}
+
+.aptivance-sidebar-role {
+  border-color: rgba(224, 240, 227, 0.1);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.aptivance-sidebar-role p {
+  color: #f2f5ee;
+}
+
+.aptivance-sidebar-readiness {
+  color: #9de0ba;
+}
+
+.aptivance-sidebar-cta {
+  background: #1b4439;
+  color: #c6eed9;
+}
+
+.aptivance-sidebar-cta:hover {
+  background: #255645;
+}
+
+.aptivance-sidebar-light .aptivance-sidebar-role {
+  border-color: #dce9dc;
+  background: #f2f7ef;
+}
+
+.aptivance-sidebar-light .aptivance-sidebar-role p {
+  color: #1d382e;
+}
+
+.aptivance-sidebar-light .aptivance-sidebar-readiness {
+  color: #20754f;
+}
+
+.aptivance-sidebar-light .aptivance-sidebar-cta {
+  background: #fff;
+  color: #176b54;
+}
+
+.aptivance-app-header {
+  border-bottom: 1px solid rgba(25, 55, 46, 0.08);
+  background: rgba(247, 248, 244, 0.91);
+  box-shadow: 0 4px 18px rgba(24, 43, 41, 0.025);
+  backdrop-filter: blur(18px);
+}
+
+.aptivance-header-inner {
+  max-width: 1540px;
+  min-height: 48px;
+  margin: 0 auto;
+}
+
+.aptivance-greeting-title {
+  color: #182b29;
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+  letter-spacing: -0.055em;
+}
+
+.aptivance-greeting-subtitle {
+  margin-top: 0.2rem;
+  color: #75827b;
+  font-size: 0.69rem;
+}
+
+.aptivance-greeting-subtitle span {
+  color: #3a5548;
+}
+
+.aptivance-header-menu,
+.aptivance-header-icon,
+.aptivance-signout,
+.aptivance-user-chip,
+.aptivance-search,
+.aptivance-role-selector {
+  border: 1px solid #e3e9e4;
+  background: rgba(255, 255, 252, 0.9);
+  color: #344a40;
+  box-shadow: 0 2px 7px rgba(25, 51, 42, 0.035);
+}
+
+.aptivance-header-menu:hover,
+.aptivance-header-icon:hover,
+.aptivance-signout:hover,
+.aptivance-user-chip:hover,
+.aptivance-search:hover,
+.aptivance-role-selector:hover {
+  border-color: #c4d8c8;
+  background: #fff;
+}
+
+.aptivance-header-menu {
+  color: #314a3e;
+}
+
+.aptivance-role-selector {
+  min-height: 40px;
+  padding: 0.35rem 0.75rem;
+}
+
+.aptivance-role-label {
+  color: #829087;
+  font-size: 0.58rem;
+  font-weight: 600;
+}
+
+.aptivance-role-name {
+  color: #1e3d31;
+  font-size: 0.7rem;
+}
+
+.aptivance-role-menu {
+  border: 1px solid #e1e9e1;
+  background: #fffefa;
+  box-shadow: 0 18px 48px rgba(18, 45, 35, 0.14);
+}
+
+.aptivance-menu-label {
+  color: #849087;
+}
+
+.aptivance-role-option,
+.aptivance-role-option-active {
+  color: #43574d;
+}
+
+.aptivance-role-option:hover,
+.aptivance-role-option-active {
+  background: #edf4e9;
+  color: #176b54;
+}
+
+.aptivance-search {
+  color: #78867d;
+}
+
+.aptivance-search-shortcut {
+  border-color: #e5e9e4;
+  background: #f3f5f1;
+  color: #7a867f;
+}
+
+.aptivance-header-icon {
+  display: inline-flex;
+  min-width: 40px;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
+.aptivance-account-button {
+  min-height: 40px;
+  background: #1a5944;
+  color: white;
+  box-shadow: 0 4px 10px rgba(26, 89, 68, 0.13);
+}
+
+.aptivance-account-button:hover {
+  background: #124a38;
+}
+
+.aptivance-signout {
+  min-height: 40px;
+}
+
+.aptivance-user-chip {
+  min-height: 40px;
+}
+
+.aptivance-user-chip img {
+  box-shadow: 0 0 0 1px #e1e7e1;
+}
+
+@media (max-width: 1023px) {
+  .aptivance-main-content {
+    padding-top: 1.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .aptivance-app-header {
+    padding: 0.75rem 0.75rem 0.8rem;
+  }
+
+  .aptivance-header-inner {
+    align-items: flex-start;
+  }
+
+  .aptivance-header-greeting {
+    min-width: 0;
+  }
+
+  .aptivance-greeting-title {
+    max-width: 175px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .aptivance-role-selector {
+    max-width: 42px;
+    overflow: hidden;
+    padding: 0.45rem;
+  }
+
+  .aptivance-role-label,
+  .aptivance-role-name,
+  .aptivance-user-chip span,
+  .aptivance-signout span {
+    display: none;
+  }
+
+  .aptivance-user-chip {
+    padding: 0.25rem;
+  }
+
+  .aptivance-header-inner > div:last-child {
+    gap: 0.4rem;
   }
 }
 

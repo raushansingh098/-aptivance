@@ -5,19 +5,15 @@ import {
   LayoutDashboard, 
   Briefcase, 
   Sliders, 
-  Sparkles, 
   ClipboardCheck, 
   BookOpen, 
-  Milestone, 
   FileText, 
-  Layers, 
   Settings, 
   X,
   Target,
   ArrowRight,
   TrendingUp,
   GraduationCap,
-  HelpCircle,
   Calendar,
   MessageSquare,
   ShieldCheck,
@@ -32,8 +28,7 @@ export const Sidebar: React.FC = () => {
     gapAnalysis, 
     isMobileSidebarOpen, 
     setIsMobileSidebarOpen,
-    sidebarTheme,
-    setSidebarTheme
+    sidebarTheme
   } = useApp();
 
   const handleNavClick = (tab: ActiveTab) => {
@@ -45,30 +40,14 @@ export const Sidebar: React.FC = () => {
 
   const navItemClass = (tab: ActiveTab) => {
     const isActive = activeTab === tab;
-    if (isDark) {
-      return `group flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-        isActive
-          ? 'bg-[#14323b] text-[#2dd4bf] shadow-sm'
-          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-      }`;
-    }
-    return `group flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
-      isActive
-        ? 'bg-[#e8f7f0] text-[#00875a] shadow-xs'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
+    return `aptivance-nav-item group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+      isActive ? 'is-active' : ''
     }`;
   };
 
   const iconClass = (tab: ActiveTab) => {
     const isActive = activeTab === tab;
-    if (isDark) {
-      return `w-4 h-4 transition-colors ${
-        isActive ? 'text-[#2dd4bf]' : 'text-slate-400 group-hover:text-slate-200'
-      }`;
-    }
-    return `w-4 h-4 transition-colors ${
-      isActive ? 'text-[#00875a]' : 'text-slate-400 group-hover:text-slate-600'
-    }`;
+    return `aptivance-nav-icon w-4 h-4 transition-colors ${isActive ? 'is-active' : ''}`;
   };
 
   return (
@@ -83,24 +62,29 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-60 border-r flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`aptivance-sidebar fixed top-0 bottom-0 left-0 z-50 w-60 border-r flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isDark 
-            ? 'bg-[#091124] border-slate-800/80 text-white' 
-            : 'bg-white border-slate-200/80 text-slate-800'
+            ? 'aptivance-sidebar-dark'
+            : 'aptivance-sidebar-light'
         } ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {/* Brand Header */}
-        <div className={`flex items-center justify-between px-5 py-4 border-b ${
+        <div className={`aptivance-sidebar-brand flex items-center justify-between px-5 py-4 border-b ${
           isDark ? 'border-slate-800/70' : 'border-slate-100'
         }`}>
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => handleNavClick('dashboard')}>
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00875a] to-[#2dd4bf] flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+          <button
+            type="button"
+            className="aptivance-sidebar-home flex items-center gap-2.5"
+            onClick={() => handleNavClick('dashboard')}
+            aria-label="Go to dashboard"
+          >
+            <div className="aptivance-sidebar-mark w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-md">
               <GraduationCap className="w-4 h-4" />
             </div>
             <div>
               <span className="text-lg font-bold tracking-tight">Aptivance</span>
             </div>
-          </div>
+          </button>
           <button
             onClick={() => setIsMobileSidebarOpen(false)}
             className="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg lg:hidden"
@@ -250,14 +234,14 @@ export const Sidebar: React.FC = () => {
 
         {/* Bottom Theme & Target Role Card */}
         <div className={`p-3 border-t ${isDark ? 'border-slate-800/70' : 'border-slate-100'}`}>
-          <div className={`p-3 rounded-2xl ${
+          <div className={`aptivance-sidebar-role p-3 rounded-2xl ${
             isDark ? 'bg-slate-800/50 border border-slate-700/50' : 'bg-emerald-50 border border-emerald-100'
           }`}>
             <div className="flex items-center justify-between text-xs mb-1">
-              <span className={`font-semibold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              <span className="font-semibold">
                 Target Role
               </span>
-              <span className={`font-bold ${isDark ? 'text-[#2dd4bf]' : 'text-emerald-700'}`}>
+              <span className="font-bold aptivance-sidebar-readiness">
                 {gapAnalysis.overallMatchPercentage}%
               </span>
             </div>
@@ -266,7 +250,7 @@ export const Sidebar: React.FC = () => {
             </p>
             <button
               onClick={() => handleNavClick('gap-analysis')}
-              className={`w-full py-1.5 px-2 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1 ${
+              className={`aptivance-sidebar-cta w-full py-1.5 px-2 rounded-xl text-[11px] font-bold transition flex items-center justify-center gap-1 ${
                 isDark 
                   ? 'bg-[#14323b] text-[#2dd4bf] hover:bg-[#1a424e]' 
                   : 'bg-white text-emerald-800 hover:bg-emerald-100'

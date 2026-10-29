@@ -20,13 +20,13 @@ const MainContent: React.FC = () => {
   const { activeTab } = useApp();
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6] flex">
+    <div className="aptivance-workspace min-h-screen flex">
       <Sidebar />
 
       <div className="flex-1 lg:pl-60 flex flex-col min-w-0">
         <Header />
 
-        <main className="flex-1 px-4 sm:px-8 py-5 max-w-7xl w-full mx-auto">
+        <main className="aptivance-main-content flex-1 px-4 sm:px-8 py-5 max-w-7xl w-full mx-auto">
           {activeTab === 'dashboard' && <DashboardView />}
           {activeTab === 'profile' && <SkillProfileView />}
           {activeTab === 'roles' && <TargetRolesView />}

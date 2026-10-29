@@ -18,6 +18,10 @@ The public welcome page is designed for students exploring career directions. It
 - **Our approach:** Personal, understandable, steady progress—with no promise of shortcuts.
 - **Closing call to action and footer:** Account creation and sign-in.
 
+### Signed-in workspace
+
+The private dashboard carries the same forest-and-leaf palette into a focused workspace: a clear role overview, readable readiness indicators, prioritized skill gaps, one suggested next step, and alternative career pathways. Navigation and cards adapt for smaller screens, while actions retain visible keyboard focus.
+
 ### Design and accessibility references
 
 - [web.dev: Responsive web design basics](https://web.dev/articles/responsive-web-design-basics) — adaptable layouts and content that fits the viewport.

@@ -30,23 +30,24 @@ export const Header: React.FC = () => {
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 bg-[#f4f7f6]/95 backdrop-blur-md px-4 sm:px-8 pt-4 pb-3 border-b border-slate-200/50">
+    <header className="aptivance-app-header sticky top-0 z-30 px-4 sm:px-8 pt-4 pb-3">
       {/* Top Bar Row */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="aptivance-header-inner flex items-center justify-between gap-4">
         {/* Left: Mobile Toggle & Welcome Greeting */}
-        <div className="flex items-center gap-3">
+        <div className="aptivance-header-greeting flex items-center gap-3">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-2 rounded-xl bg-white border border-slate-200/80 text-slate-600 hover:text-slate-900 lg:hidden shadow-xs"
+            className="aptivance-header-menu p-2 rounded-xl lg:hidden"
+            aria-label="Open navigation"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="aptivance-greeting-title text-xl sm:text-2xl font-black tracking-tight">
               Hi {currentStudent.name}
             </h1>
-            <p className="text-xs text-slate-500 font-medium">
+            <p className="aptivance-greeting-subtitle text-xs font-medium">
               Target role: <span className="font-bold text-slate-800">{activeRole.title}</span>
             </p>
           </div>
@@ -58,15 +59,16 @@ export const Header: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 shadow-xs hover:border-slate-300 transition"
+              className="aptivance-role-selector flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition"
             >
-              <span>{activeRole.title}</span>
+              <span className="aptivance-role-label">Target role</span>
+              <span className="aptivance-role-name">{activeRole.title}</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
             </button>
 
             {isRoleDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 animate-in fade-in slide-in-from-top-2">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 block">
+              <div className="aptivance-role-menu absolute right-0 mt-2 w-56 rounded-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2">
+                <span className="aptivance-menu-label text-[10px] font-bold uppercase tracking-wider px-2 py-1 block">
                   Select Target Role
                 </span>
                 <div className="space-y-1">
@@ -79,8 +81,8 @@ export const Header: React.FC = () => {
                       }}
                       className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
                         r.id === activeRole.id
-                          ? 'bg-teal-50 text-teal-800 font-bold'
-                          : 'text-slate-700 hover:bg-slate-50'
+                          ? 'aptivance-role-option-active font-bold'
+                          : 'aptivance-role-option'
                       }`}
                     >
                       {r.title}
@@ -94,11 +96,11 @@ export const Header: React.FC = () => {
           {/* Quick Search Shortcut */}
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-700 hover:border-slate-300 shadow-xs transition"
+            className="aptivance-search hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition"
           >
             <Search className="w-3.5 h-3.5" />
             <span>Search</span>
-            <kbd className="px-1 py-0.5 text-[10px] bg-slate-100 text-slate-500 rounded border border-slate-200">
+            <kbd             className="aptivance-search-shortcut px-1 py-0.5 text-[10px] rounded border">
               ⌘K
             </kbd>
           </button>
@@ -111,7 +113,8 @@ export const Header: React.FC = () => {
               showToast(`Switched to ${next === 'dark-navy' ? 'Dark Navy' : 'Light'} sidebar theme`);
             }}
             title="Toggle Sidebar Theme"
-            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-xs"
+            aria-label="Toggle sidebar theme"
+            className="aptivance-header-icon p-2 rounded-xl"
           >
             {sidebarTheme === 'dark-navy' ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-slate-600" />}
           </button>
@@ -121,7 +124,7 @@ export const Header: React.FC = () => {
               onClick={() => {
                 void logoutUser();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:border-slate-300 shadow-xs transition"
+              className="aptivance-signout flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign out</span>
@@ -132,18 +135,18 @@ export const Header: React.FC = () => {
                 setAuthMode('register');
                 setIsAuthModalOpen(true);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 shadow-xs transition"
+              className="aptivance-account-button flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">{isSyncing ? 'Syncing' : 'Account'}</span>
             </button>
           )}
 
-          <div className="flex items-center gap-2 p-1 sm:px-2 sm:py-1 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="aptivance-user-chip flex items-center gap-2 p-1 sm:px-2 sm:py-1 rounded-xl">
             <img
               src={currentStudent.avatarUrl}
               alt={currentStudent.name}
-              className="w-7 h-7 rounded-lg object-cover ring-1 ring-slate-200"
+              className="w-7 h-7 rounded-lg object-cover"
             />
             <span className="hidden sm:inline text-xs font-bold text-slate-800">
               {currentStudent.name}
