@@ -1,282 +1,373 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  CircleCheck,
+  X,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TargetRole } from '../../types';
-import { 
-  Check, 
-  X, 
-  Layers, 
-  SlidersHorizontal,
-  ChevronRight,
-  Info
-} from 'lucide-react';
 import { computeGapAnalysis } from '../../utils/analysisUtils';
+import './TargetRolesView.css';
+
+type RoleFilter = 'All roles' | 'Entry' | 'Intermediate';
+
+const fitFor = (role: TargetRole, skills: ReturnType<typeof useApp>['skills'], studentSkills: ReturnType<typeof useApp>['currentStudent']['skills']) =>
+  computeGapAnalysis(role, studentSkills, skills);
+
+const isEntryRole = (role: TargetRole) => role.level.toLowerCase().includes('entry');
+
+const RoleFit: React.FC<{ score: number; compact?: boolean }> = ({ score, compact = false }) => (
+  <span
+    className={`career-role-fit${compact ? ' career-role-fit-compact' : ''}`}
+    role="img"
+    aria-label={`${Math.round(score)}% fit`}
+  >
+    <svg viewBox="0 0 42 42" aria-hidden="true">
+      <circle className="career-role-fit-track" cx="21" cy="21" r="17" />
+      <circle
+        className="career-role-fit-value"
+        cx="21"
+        cy="21"
+        r="17"
+        strokeDasharray="106.8"
+        strokeDashoffset={`${106.8 * (1 - score / 100)}`}
+      />
+    </svg>
+    <span>{Math.round(score)}</span>
+  </span>
+);
 
 export const TargetRolesView: React.FC = () => {
-  const { 
-    roles, 
-    skills, 
-    currentStudent, 
-    setTargetRole, 
+  const {
+    roles,
+    skills,
+    currentStudent,
+    setTargetRole,
     setActiveTab,
     roleComparisonIds,
     toggleRoleComparison,
-    showToast 
   } = useApp();
 
-  const [selectedRoleForDetail, setSelectedRoleForDetail] = useState<TargetRole | null>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<RoleFilter>('All roles');
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
-  const comparedRoles = roles.filter(r => roleComparisonIds.includes(r.id));
+  const roleResults = useMemo(
+    () =>
+      roles
+        .map(role => ({
+          role,
+          analysis: fitFor(role, skills, currentStudent.skills),
+        }))
+        .sort((a, b) => b.analysis.overallMatchPercentage - a.analysis.overallMatchPercentage),
+    [roles, skills, currentStudent.skills],
+  );
+  const selectedRole =
+    roles.find(role => role.id === selectedRoleId) ??
+    roles.find(role => role.id === currentStudent.targetRoleId) ??
+    roles[0];
+  const selectedAnalysis = selectedRole
+    ? fitFor(selectedRole, skills, currentStudent.skills)
+    : null;
+  const comparedRoles = roles.filter(role => roleComparisonIds.includes(role.id));
+  const visibleResults = roleResults.filter(({ role }) => {
+    if (filter === 'Entry') return isEntryRole(role);
+    if (filter === 'Intermediate') return !isEntryRole(role);
+    return true;
+  });
+  const strongMatches = visibleResults.filter(({ analysis }) => analysis.overallMatchPercentage >= 60);
+  const adjacentPaths = visibleResults.filter(({ analysis }) => analysis.overallMatchPercentage < 60);
+  const filters: RoleFilter[] = ['All roles', 'Entry', 'Intermediate'];
+
+  const renderRoleRow = (role: TargetRole, score: number, gapCount: number) => {
+    const isTarget = role.id === currentStudent.targetRoleId;
+    const isSelected = role.id === selectedRole?.id;
+    const isCompared = roleComparisonIds.includes(role.id);
+
+    return (
+      <div
+        key={role.id}
+        className={`career-role-row${isSelected ? ' is-selected' : ''}`}
+      >
+        <button
+          type="button"
+          className="career-role-row-main"
+          onClick={() => setSelectedRoleId(role.id)}
+          aria-pressed={isSelected}
+        >
+          <RoleFit score={score} compact />
+          <span className="career-role-row-copy">
+            <span className="career-role-row-title">
+              {role.title}
+              {isTarget && <span className="career-role-target-tag">Your target</span>}
+            </span>
+            <span className="career-role-row-description">{role.description}</span>
+            <span className="career-role-row-meta">
+              <span>{role.level}</span>
+              <span>{role.skills.length} skills</span>
+              <span>~{role.weeksOfLearning} wks</span>
+              <span>{role.salaryRange}</span>
+              <span className={`career-demand career-demand-${role.marketDemand.toLowerCase().replace(' ', '-')}`}>
+                {role.marketDemand}
+              </span>
+              <span>{gapCount} {gapCount === 1 ? 'gap' : 'gaps'}</span>
+            </span>
+          </span>
+        </button>
+        <button
+          type="button"
+          className={`career-role-compare${isCompared ? ' is-compared' : ''}`}
+          onClick={() => toggleRoleComparison(role.id)}
+          aria-pressed={isCompared}
+          aria-label={`${isCompared ? 'Remove' : 'Add'} ${role.title} ${isCompared ? 'from' : 'to'} comparison`}
+        >
+          {isCompared ? <Check size={15} /> : <span aria-hidden="true">+</span>}
+          <span>{isCompared ? 'Added' : 'Compare'}</span>
+        </button>
+        <ChevronRight className="career-role-chevron" size={16} aria-hidden="true" />
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-150">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="career-roles-page">
+      <div className="career-roles-heading">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            Career Roles
-          </h2>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Explore industry benchmark roles, required skills, and learning timeframes.
-          </p>
+          <div className="career-roles-breadcrumb">Career <span>/</span> Career roles</div>
+          <h2>Career roles</h2>
+          <p>{roles.length} paths matched to your profile. Compare fit, money and time before you commit.</p>
         </div>
-
-        {/* Compare Trigger Button */}
-        {roleComparisonIds.length > 0 && (
+        <div className="career-roles-heading-actions">
           <button
+            type="button"
+            className="career-secondary-button"
             onClick={() => setIsCompareModalOpen(true)}
-            className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
+            disabled={roleComparisonIds.length === 0}
           >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span>Compare Selected ({roleComparisonIds.length})</span>
+            <SlidersHorizontal size={15} />
+            Compare <span className="career-button-count">{roleComparisonIds.length}</span>
           </button>
-        )}
+          <button
+            type="button"
+            className="career-secondary-button"
+            onClick={() => setActiveTab('gap-analysis')}
+          >
+            Gap analysis
+          </button>
+        </div>
       </div>
 
-      {/* Roles Grid matching Screenshot 3 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {roles.map(role => {
-          const isTarget = role.id === currentStudent.targetRoleId;
-          const isCompared = roleComparisonIds.includes(role.id);
-
+      <div className="career-role-filters" aria-label="Filter roles">
+        {filters.map(option => {
+          const count = option === 'All roles'
+            ? roles.length
+            : roles.filter(role => option === 'Entry' ? isEntryRole(role) : !isEntryRole(role)).length;
           return (
-            <div
-              key={role.id}
-              className={`bg-white rounded-2xl p-6 border transition flex flex-col justify-between shadow-xs hover:shadow-md relative ${
-                isTarget ? 'border-teal-300' : 'border-slate-200/80'
-              }`}
+            <button
+              type="button"
+              key={option}
+              className={`career-role-filter${filter === option ? ' is-active' : ''}`}
+              onClick={() => setFilter(option)}
+              aria-pressed={filter === option}
             >
-              <div>
-                {/* Header row with Title & Target Badge */}
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-lg font-black text-slate-900">
-                    {role.title}
-                  </h3>
-
-                  {/* Target Badge (Soft Teal Pill at top right matching screenshot 3) */}
-                  {isTarget && (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#ccfbf1] text-[#0f766e]">
-                      Target
-                    </span>
-                  )}
-                </div>
-
-                {/* Subtitle / Description */}
-                <p className="text-xs text-slate-500 leading-relaxed mb-4 min-h-[32px]">
-                  {role.description}
-                </p>
-
-                {/* Pills Row: Seniority Level & Required Skills */}
-                <div className="flex items-center gap-2 mb-2 text-xs">
-                  <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px] border border-slate-200">
-                    {role.level}
-                  </span>
-                  <span className="text-slate-500 text-xs font-medium">
-                    {role.skills.length} required skills
-                  </span>
-                </div>
-
-                {/* Weeks of Learning */}
-                <div className="text-xs text-slate-500 mb-6">
-                  ~{role.weeksOfLearning} weeks of learning
-                </div>
-              </div>
-
-              {/* Action Buttons Row matching Screenshot 3 */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                {/* Select / Remove Button */}
-                {isTarget ? (
-                  <button
-                    onClick={() => {
-                      showToast('Cannot remove primary target role. Select another role to change.');
-                    }}
-                    className="py-1.5 px-3 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition flex items-center gap-1"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                    <span>Remove</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setTargetRole(role.id);
-                      setActiveTab('gap-analysis');
-                    }}
-                    className="py-1.5 px-3 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-blue-700 transition flex items-center gap-1 shadow-xs"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Select</span>
-                  </button>
-                )}
-
-                {/* Details Button */}
-                <button
-                  onClick={() => setSelectedRoleForDetail(role)}
-                  className="py-1.5 px-3 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition"
-                >
-                  Details
-                </button>
-
-                {/* Compare Button */}
-                <button
-                  onClick={() => toggleRoleComparison(role.id)}
-                  className={`text-xs font-bold transition flex items-center gap-1 ${
-                    isCompared ? 'text-teal-700' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <SlidersHorizontal className="w-3 h-3" />
-                  <span>{isCompared ? 'Comparing' : 'Compare'}</span>
-                </button>
-              </div>
-            </div>
+              {option} <span>{count}</span>
+            </button>
           );
         })}
       </div>
 
-      {/* Role Details Drawer / Modal */}
-      {selectedRoleForDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <div className="flex items-start justify-between pb-3 border-b border-slate-100 mb-4">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-md">
-                  {selectedRoleForDetail.level}
-                </span>
-                <h3 className="text-2xl font-black text-slate-900 mt-1">
-                  {selectedRoleForDetail.title}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Est. Preparation: ~{selectedRoleForDetail.weeksOfLearning} weeks
-                </p>
+      <div className="career-roles-layout">
+        <section className="career-role-list" aria-label="Matching career roles">
+          {strongMatches.length > 0 && (
+            <div className="career-role-group">
+              <div className="career-role-group-heading">
+                <span>Strong match</span><span>{strongMatches.length}</span>
               </div>
+              {strongMatches.map(({ role, analysis }) =>
+                renderRoleRow(role, analysis.overallMatchPercentage, analysis.priorityGaps.length),
+              )}
+            </div>
+          )}
+          {adjacentPaths.length > 0 && (
+            <div className="career-role-group">
+              <div className="career-role-group-heading">
+                <span>Adjacent paths</span><span>{adjacentPaths.length}</span>
+              </div>
+              {adjacentPaths.map(({ role, analysis }) =>
+                renderRoleRow(role, analysis.overallMatchPercentage, analysis.priorityGaps.length),
+              )}
+            </div>
+          )}
+          {visibleResults.length === 0 && (
+            <div className="career-role-empty">No roles match this filter yet.</div>
+          )}
+        </section>
+
+        {selectedRole && selectedAnalysis && (
+          <aside className="career-role-detail" aria-label={`${selectedRole.title} details`}>
+            <div className="career-role-detail-eyebrow">Selected role</div>
+            <div className="career-role-detail-title-row">
+              <div>
+                <h3>{selectedRole.title}</h3>
+                <p>{selectedRole.description}</p>
+              </div>
+              <RoleFit score={selectedAnalysis.overallMatchPercentage} />
+            </div>
+
+            <div className="career-role-stats">
+              <div><span>Salary range</span><strong>{selectedRole.salaryRange}</strong></div>
+              <div><span>Market demand</span><strong>{selectedRole.marketDemand}</strong></div>
+              <div><span>Time to ready</span><strong>~{selectedAnalysis.estimatedTimeToReadyWeeks} wks</strong></div>
+              <div><span>Required skills</span><strong>{selectedRole.skills.length}</strong></div>
+            </div>
+
+            <div className="career-role-overlap">
+              <div className="career-role-section-heading">
+                <strong>Skill overlap</strong>
+                <span>{selectedAnalysis.strengths.length} of {selectedRole.skills.length} covered</span>
+              </div>
+              <div className="career-role-skill-chips">
+                {selectedAnalysis.items.map(item => (
+                  <span
+                    className={`career-role-skill-chip${item.status === 'strength' ? ' is-covered' : ''}`}
+                    key={item.skill.id}
+                  >
+                    {item.status === 'strength' && <Check size={11} />}
+                    {item.skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="career-role-responsibilities">
+              <strong>What you'd do</strong>
+              <ul>
+                {selectedRole.responsibilities.slice(0, 3).map((responsibility, index) => (
+                  <li key={`${selectedRole.id}-responsibility-${index}`}>{responsibility}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="career-role-gap-note">
+              <CircleCheck size={15} />
+              <span><strong>{selectedAnalysis.priorityGaps.length} priority gaps</strong> · about {selectedAnalysis.estimatedTimeToReadyWeeks} weeks to prepare</span>
+            </div>
+
+            <div className="career-role-detail-actions">
+              {selectedRole.id === currentStudent.targetRoleId ? (
+                <button
+                  type="button"
+                  className="career-secondary-button"
+                  onClick={() => toggleRoleComparison(selectedRole.id)}
+                >
+                  {roleComparisonIds.includes(selectedRole.id) ? <X size={14} /> : <SlidersHorizontal size={14} />}
+                  {roleComparisonIds.includes(selectedRole.id) ? 'Remove' : 'Compare'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="career-secondary-button"
+                  onClick={() => toggleRoleComparison(selectedRole.id)}
+                >
+                  {roleComparisonIds.includes(selectedRole.id) ? <X size={14} /> : <SlidersHorizontal size={14} />}
+                  {roleComparisonIds.includes(selectedRole.id) ? 'Remove' : 'Compare'}
+                </button>
+              )}
               <button
-                onClick={() => setSelectedRoleForDetail(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                type="button"
+                className="career-primary-button"
+                onClick={() => {
+                  setTargetRole(selectedRole.id);
+                  setActiveTab('gap-analysis');
+                }}
               >
-                <X className="w-5 h-5" />
+                {selectedRole.id === currentStudent.targetRoleId ? 'Your target — view gaps' : 'Set as target — view gaps'}
+                <ArrowRight size={14} />
               </button>
             </div>
+          </aside>
+        )}
+      </div>
 
-            <div className="space-y-4 text-xs">
-              <div>
-                <h4 className="font-bold text-slate-900 mb-1">Description</h4>
-                <p className="text-slate-600 leading-relaxed">{selectedRoleForDetail.description}</p>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-slate-900 mb-2">Required Skills Profile</h4>
-                <div className="space-y-1.5">
-                  {selectedRoleForDetail.skills.map(req => {
-                    const sMeta = skills.find(s => s.id === req.skillId);
-                    return (
-                      <div key={req.skillId} className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                        <span className="font-semibold text-slate-800">{sMeta?.name || 'Skill'}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-400">Weight: {req.numericWeight || 4}</span>
-                          <span className="font-bold px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700">
-                            Lvl {req.requiredLevel}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                <button
-                  onClick={() => setSelectedRoleForDetail(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    setTargetRole(selectedRoleForDetail.id);
-                    setSelectedRoleForDetail(null);
-                    setActiveTab('gap-analysis');
-                  }}
-                  className="px-4 py-2 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-blue-700 shadow-xs"
-                >
-                  Set as Target Role
-                </button>
-              </div>
+      {roleComparisonIds.length > 0 && (
+        <div className="career-compare-dock" role="region" aria-label="Role comparison selection">
+          <div className="career-compare-dock-label">
+            <span>Compare</span>
+            <div className="career-compare-dock-chips">
+              {comparedRoles.map(role => (
+                <span className="career-compare-chip" key={role.id}>
+                  {role.title}
+                  <button
+                    type="button"
+                    onClick={() => toggleRoleComparison(role.id)}
+                    aria-label={`Remove ${role.title} from comparison`}
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
+          <button
+            type="button"
+            className="career-primary-button"
+            onClick={() => setIsCompareModalOpen(true)}
+          >
+            Compare {comparedRoles.length} <ArrowRight size={14} />
+          </button>
         </div>
       )}
 
-      {/* Role Comparison Modal */}
       {isCompareModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <h3 className="font-black text-slate-900 text-lg flex items-center gap-2">
-                <SlidersHorizontal className="w-5 h-5 text-teal-600" />
-                <span>Side-by-Side Career Role Comparison</span>
-              </h3>
+        <div
+          className="career-modal-backdrop"
+          onClick={event => {
+            if (event.target === event.currentTarget) setIsCompareModalOpen(false);
+          }}
+        >
+          <div className="career-compare-modal" role="dialog" aria-modal="true" aria-labelledby="career-compare-title">
+            <div className="career-compare-modal-heading">
+              <div>
+                <span className="career-role-detail-eyebrow">Make your next move</span>
+                <h3 id="career-compare-title">Compare career paths</h3>
+              </div>
               <button
+                type="button"
+                className="career-modal-close"
                 onClick={() => setIsCompareModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                aria-label="Close comparison"
               >
-                <X className="w-5 h-5" />
+                <X size={18} />
               </button>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="career-compare-modal-grid">
               {comparedRoles.map(role => {
-                const analysis = computeGapAnalysis(role, currentStudent.skills, skills);
+                const analysis = fitFor(role, skills, currentStudent.skills);
                 return (
-                  <div key={role.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-bold text-slate-900 text-sm">{role.title}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
-                        {role.level}
-                      </span>
+                  <article className="career-compare-card" key={role.id}>
+                    <span className="career-role-detail-eyebrow">{role.level}</span>
+                    <h4>{role.title}</h4>
+                    <RoleFit score={analysis.overallMatchPercentage} />
+                    <div className="career-compare-card-stats">
+                      <span>Salary <strong>{role.salaryRange}</strong></span>
+                      <span>Time to ready <strong>~{analysis.estimatedTimeToReadyWeeks} weeks</strong></span>
+                      <span>Priority gaps <strong>{analysis.priorityGaps.length}</strong></span>
                     </div>
-
-                    <div className="p-3 rounded-xl bg-white border border-slate-200/80 text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Your Match</span>
-                      <span className="text-2xl font-black text-teal-700">{analysis.overallMatchPercentage}%</span>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Weighted Gap: {analysis.weightedGapPercentage}%</p>
-                    </div>
-
-                    <div className="space-y-1 text-xs text-slate-600">
-                      <p>• Estimated prep: <strong>~{role.weeksOfLearning} weeks</strong></p>
-                      <p>• Required competencies: <strong>{role.skills.length} skills</strong></p>
-                      <p>• Priority gaps: <strong className="text-rose-600">{analysis.priorityGaps.length} gaps</strong></p>
-                    </div>
-
                     <button
+                      type="button"
+                      className="career-primary-button"
                       onClick={() => {
                         setTargetRole(role.id);
                         setIsCompareModalOpen(false);
                         setActiveTab('gap-analysis');
                       }}
-                      className="w-full py-2 rounded-xl bg-[#1d4ed8] text-white text-xs font-bold hover:bg-blue-700 shadow-xs"
                     >
-                      Set As Target Role
+                      Set as target <ArrowRight size={14} />
                     </button>
-                  </div>
+                  </article>
                 );
               })}
             </div>
